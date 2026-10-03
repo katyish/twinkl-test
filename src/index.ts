@@ -11,3 +11,5 @@ app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
+
+export default app;
