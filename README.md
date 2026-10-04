@@ -88,3 +88,7 @@ npm run build
 npm start
 ```
 
+To run using Docker:
+```
+docker compose up
+```
