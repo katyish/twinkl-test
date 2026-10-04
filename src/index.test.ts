@@ -32,6 +32,12 @@ describe('/user endpoints', () => {
         .send({ ...validUserInput, name: '' })
         .set('Accept', 'application/json');
       expect(response.status).toBe(400);
+      expect(response.body.errors).toEqual([
+        expect.objectContaining({
+          path: ['name'],
+          code: 'too_small',
+        }),
+      ]);
     });
     it('returns an error for invalid password', async () => {
       const response = await request(app)
@@ -39,14 +45,31 @@ describe('/user endpoints', () => {
         .send({ ...validUserInput, password: 'anc4' })
         .set('Accept', 'application/json');
       expect(response.status).toBe(400);
+      expect(response.body.errors).toEqual([
+        expect.objectContaining({
+          path: ['password'],
+          code: 'too_small',
+          message: 'Too small: expected string to have >=8 characters',
+        }),
+        expect.objectContaining({
+          path: ['password'],
+          code: 'invalid_format',
+        }),
+      ]);
     });
 
-    it('returns an error for invalid password', async () => {
+    it('returns an error for invalid userType', async () => {
       const response = await request(app)
         .post('/user')
         .send({ ...validUserInput, userType: 'nurse' })
         .set('Accept', 'application/json');
       expect(response.status).toBe(400);
+      expect(response.body.errors).toEqual([
+        expect.objectContaining({
+          path: ['userType'],
+          code: 'invalid_value',
+        }),
+      ]);
     });
     it.todo('returns an error if user already exists');
   });

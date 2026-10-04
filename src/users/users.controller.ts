@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { Request, Response } from 'express';
 import { userService } from './users.service';
+import { ZodError } from 'zod';
 
 export const getUser = (req: Request, res: Response) => {
   const user = userService.getUserById(req.params.id);
@@ -17,8 +18,11 @@ export const createUser = (req: Request, res: Response) => {
     const newUser = userService.createUser(req.body);
     res.status(201).json(newUser);
   } catch (error: any) {
-    // TODO: surface zod validation errors
-    console.log('caught error', error);
-    res.status(400).send(error);
+    if (error instanceof ZodError) {
+      res
+        .status(400)
+        .json({ message: 'Validation Failed', errors: error.issues });
+    }
+    res.status(500).send('Server Error');
   }
 };
