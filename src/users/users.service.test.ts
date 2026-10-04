@@ -32,7 +32,7 @@ describe('createUser', () => {
     const newUserInput = {
       name: 'fred',
       email: 'fred@hotmail.com',
-      password: 'Abc123yx',
+      password: 'ABc5Dfg83',
       userType: 'student',
     };
     const response = userService.createUser(newUserInput);
@@ -41,10 +41,113 @@ describe('createUser', () => {
     // todo: check we have a createdAt date
   });
 
-  it('throws an error if data validation fails', async () => {
-    const newUserInput = { name: 'fred' };
+  // test validation rules specified in instructions
+  it('throws an error if a field is missing', async () => {
+    const newUserInput = {
+      // missing email field
+      name: 'fred',
+      password: 'Abc123yx',
+      userType: 'student',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('received undefined');
+  });
+
+  it('throws an error if a field is empty', async () => {
+    const newUserInput = {
+      name: '',
+      email: 'fred@hotmail.com',
+      password: 'AbcdeF99',
+      userType: 'student',
+    };
     expect(() => {
       userService.createUser(newUserInput);
     }).toThrow();
+  });
+  it('throws an error if password is too short', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fred@hotmail.com',
+      password: 'aB9',
+      userType: 'student',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('Too small');
+  });
+
+  it('throws an error if password is too long', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fred@hotmail.com',
+      password:
+        'aaaaaaAAAAAAAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa88888aaaaaaaaaaaaaaaaaaaaaaaaa',
+      userType: 'student',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('Too big');
+  });
+
+  it('throws an error if password does not contain a number', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fred@hotmail.com',
+      password: 'ABCdefGH',
+      userType: 'student',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('Must contain at least one number');
+  });
+
+  it('throws an error if password does not contain a lowercase letter', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fred@hotmail.com',
+      password: 'ABCDEFGH',
+      userType: 'student',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('Must contain at least one lowercase letter');
+  });
+
+  it('throws an error if password does not contain an uppercase letter', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fred@hotmail.com',
+      password: 'abcdefgh',
+      userType: 'student',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('Must contain at least one uppercase letter');
+  });
+
+  // test other validation
+  it('throws an error if email is invalid', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fredAThotmail.com',
+      password: 'AbcdeF99',
+      userType: 'student',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('Invalid email address');
+  });
+
+  it('throws an error if userType is invalid', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fred@hotmail.com',
+      password: 'AbcdeF99',
+      userType: 'unemployed',
+    };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow('Invalid option');
   });
 });
