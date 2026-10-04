@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { Request, Response } from 'express';
-import { userService } from './users.service';
 import { ZodError } from 'zod';
+import { userService } from './users.service';
 
 export const getUser = (req: Request, res: Response) => {
   const user = userService.getUserById(req.params.id);
