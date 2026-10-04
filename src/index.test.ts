@@ -13,7 +13,7 @@ describe('/user endpoints', () => {
   describe('POST /user', () => {
     const validUserInput = {
       name: 'fred smith',
-      password: '123456ABC',
+      password: '123456Abc',
       email: 'fred@gmail.com',
       userType: 'teacher',
     };
@@ -26,8 +26,28 @@ describe('/user endpoints', () => {
       expect(response.body).toMatchObject(validUserInput);
     });
 
-    it.todo('returns an error for missing data');
-    it.todo('returns an error for invalid data');
+    it('returns an error for missing data', async () => {
+      const response = await request(app)
+        .post('/user')
+        .send({ ...validUserInput, name: '' })
+        .set('Accept', 'application/json');
+      expect(response.status).toBe(400);
+    });
+    it('returns an error for invalid password', async () => {
+      const response = await request(app)
+        .post('/user')
+        .send({ ...validUserInput, password: 'anc4' })
+        .set('Accept', 'application/json');
+      expect(response.status).toBe(400);
+    });
+
+    it('returns an error for invalid password', async () => {
+      const response = await request(app)
+        .post('/user')
+        .send({ ...validUserInput, userType: 'nurse' })
+        .set('Accept', 'application/json');
+      expect(response.status).toBe(400);
+    });
     it.todo('returns an error if user already exists');
   });
 
