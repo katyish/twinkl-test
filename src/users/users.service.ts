@@ -16,7 +16,13 @@ export type User = {
 export const createUserSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.email(),
-  password: z.string().min(8).max(64),
+  password: z
+    .string()
+    .min(8)
+    .max(64)
+    .regex(/[A-Z]/, { message: 'Must contain at least one uppercase letter' })
+    .regex(/[a-z]/, { message: 'Must contain at least one lowercase letter' })
+    .regex(/[0-9]/, { message: 'Must contain at least one number' }),
   userType: z.enum(['student', 'teacher', 'parent', 'private tutor']),
 });
 
