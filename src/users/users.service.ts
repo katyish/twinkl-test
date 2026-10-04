@@ -1,8 +1,10 @@
+import { UUID } from 'crypto';
+
 /* eslint-disable no-console */
 export type UserType = 'student' | 'teacher' | 'parent' | 'private tutor';
 
 export type User = {
-  id: number;
+  id: UUID;
   name: string;
   email: string;
   password: string;
@@ -13,7 +15,7 @@ export type User = {
 class UserService {
   private userList: Array<User> = [
     {
-      id: 1,
+      id: 'a8429ab6-b732-4cb9-bfb0-65e4db324394',
       name: 'John Doe',
       email: 'jd@jd.com',
       password: '123456',
@@ -23,9 +25,8 @@ class UserService {
   ];
 
   getUserById = (userId: string): User | null => {
-    const id = parseInt(userId, 10);
-    console.log(`fetching user id ${id}`);
-    const user = this.userList.find((u) => u.id === id);
+    console.log(`fetching user id ${userId}`);
+    const user = this.userList.find((u) => u.id === userId);
     if (user) {
       return user;
     }

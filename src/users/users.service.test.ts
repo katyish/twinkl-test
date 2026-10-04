@@ -3,7 +3,7 @@ import { userService } from './users.service';
 const invalidUserId = '88';
 const validUser = {
   // matches our hardcoded seed data
-  id: 1,
+  id: 'a8429ab6-b732-4cb9-bfb0-65e4db324394',
   name: 'John Doe',
   email: 'jd@jd.com',
   password: '123456',
@@ -13,7 +13,7 @@ const validUser = {
 
 describe('getUserById', () => {
   it('returns a user for a valid id', async () => {
-    const response = userService.getUserById(validUser.id.toString());
+    const response = userService.getUserById(validUser.id);
     expect(response).toMatchObject(validUser);
   });
 

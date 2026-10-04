@@ -20,7 +20,7 @@ describe('/user endpoints', () => {
   describe('GET /user:id', () => {
     const invalidUserId = 10000;
     const validUser = {
-      id: 1,
+      id: 'a8429ab6-b732-4cb9-bfb0-65e4db324394',
       name: 'John Doe',
       email: 'jd@jd.com',
       password: '123456',
@@ -31,7 +31,7 @@ describe('/user endpoints', () => {
     it('returns a JSON object of user details for a known user id', async () => {
       const response = await request(app).get(`/user/${validUser.id}`);
       expect(response.status).toBe(200);
-      expect(response.body).toMatchObject({ id: 1, name: 'John Doe' });
+      expect(response.body).toMatchObject(validUser);
     });
 
     it('returns an error if the user id does not exist', async () => {
