@@ -1,4 +1,5 @@
-import { UUID } from 'crypto';
+import { randomUUID, UUID } from 'crypto';
+import { z } from 'zod';
 
 /* eslint-disable no-console */
 export type UserType = 'student' | 'teacher' | 'parent' | 'private tutor';
@@ -11,6 +12,15 @@ export type User = {
   userType: UserType;
   createdAt: string;
 };
+
+export const createUserSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.email(),
+  password: z.string().min(8).max(64),
+  userType: z.enum(['student', 'teacher', 'parent', 'private tutor']),
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 class UserService {
   private userList: Array<User> = [
@@ -33,8 +43,16 @@ class UserService {
     return null;
   };
 
-  // eslint-disable-next-line class-methods-use-this
-  createUser = () => false;
+  createUser = (input: unknown) => {
+    const validInput: CreateUserInput = createUserSchema.parse(input);
+    const newUser: User = {
+      ...validInput,
+      id: randomUUID(),
+      createdAt: '2026-10-04',
+    };
+    this.userList.push(newUser);
+    return newUser;
+  };
 }
 
 export const userService = new UserService();

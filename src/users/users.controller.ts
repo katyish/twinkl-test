@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Request, Response } from 'express';
 import { userService } from './users.service';
 
@@ -11,5 +12,13 @@ export const getUser = (req: Request, res: Response) => {
 };
 
 export const createUser = (req: Request, res: Response) => {
-  res.send('not implemented');
+  try {
+    console.log('creating new user');
+    const newUser = userService.createUser(req.body);
+    res.status(201).json(newUser);
+  } catch (error: any) {
+    // TODO: surface zod validation errors
+    console.log('caught error', error);
+    res.status(400).send(error);
+  }
 };

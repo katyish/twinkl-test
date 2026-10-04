@@ -4,6 +4,8 @@ import * as userController from './users/users.controller';
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
+app.use(express.json());
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });

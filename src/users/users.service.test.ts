@@ -1,5 +1,9 @@
 import { userService } from './users.service';
 
+jest.mock('crypto', () => ({
+  randomUUID: () => 'mock-random-uuid',
+}));
+
 const invalidUserId = '88';
 const validUser = {
   // matches our hardcoded seed data
@@ -20,5 +24,27 @@ describe('getUserById', () => {
   it('returns null if user does not exist', async () => {
     const response = userService.getUserById(invalidUserId);
     expect(response).toBeNull();
+  });
+});
+
+describe('createUser', () => {
+  it('returns user object if creation successful', async () => {
+    const newUserInput = {
+      name: 'fred',
+      email: 'fred@hotmail.com',
+      password: 'Abc123yx',
+      userType: 'student',
+    };
+    const response = userService.createUser(newUserInput);
+    expect(response).toMatchObject(newUserInput);
+    expect(response?.id).toBe('mock-random-uuid');
+    // todo: check we have a createdAt date
+  });
+
+  it('throws an error if data validation fails', async () => {
+    const newUserInput = { name: 'fred' };
+    expect(() => {
+      userService.createUser(newUserInput);
+    }).toThrow();
   });
 });

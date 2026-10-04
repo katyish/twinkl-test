@@ -11,7 +11,21 @@ describe('/ endpoint', () => {
 
 describe('/user endpoints', () => {
   describe('POST /user', () => {
-    it.todo('accepts valid data and creates a user');
+    const validUserInput = {
+      name: 'fred smith',
+      password: '123456ABC',
+      email: 'fred@gmail.com',
+      userType: 'teacher',
+    };
+    it('accepts valid data and creates a user', async () => {
+      const response = await request(app)
+        .post('/user')
+        .send(validUserInput)
+        .set('Accept', 'application/json');
+      expect(response.status).toBe(201);
+      expect(response.body).toMatchObject(validUserInput);
+    });
+
     it.todo('returns an error for missing data');
     it.todo('returns an error for invalid data');
     it.todo('returns an error if user already exists');
