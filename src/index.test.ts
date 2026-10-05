@@ -1,5 +1,6 @@
 import request from 'supertest';
 import app from '.';
+import { UserResponse } from './users/users.service';
 
 describe('/ endpoint', () => {
   it('GET / should return hello world', async () => {
@@ -17,6 +18,14 @@ describe('/user endpoints', () => {
     userType: 'teacher',
   };
 
+  const validUserResponse: UserResponse = {
+    id: expect.any(String),
+    name: 'fred smith',
+    email: 'fred@gmail.com',
+    userType: 'teacher',
+    createdAt: expect.any(String),
+  };
+
   describe('POST /user', () => {
     it('accepts valid data and creates a user', async () => {
       const response = await request(app)
@@ -24,7 +33,7 @@ describe('/user endpoints', () => {
         .send(validUserInput)
         .set('Accept', 'application/json');
       expect(response.status).toBe(201);
-      expect(response.body).toMatchObject(validUserInput);
+      expect(response.body).toMatchObject(validUserResponse);
     });
 
     it('returns an error for missing data', async () => {
@@ -76,19 +85,18 @@ describe('/user endpoints', () => {
 
   describe('GET /user:id', () => {
     const invalidUserId = 10000;
-    const validUser = {
+    const knownUserResponse = {
       id: 'a8429ab6-b732-4cb9-bfb0-65e4db324394',
       name: 'John Doe',
       email: 'jd@jd.com',
-      password: '123456',
       userType: 'student',
       createdAt: '2026-10-04T17:00:00Z',
     };
 
     it('returns a JSON object of user details for a known user id', async () => {
-      const response = await request(app).get(`/user/${validUser.id}`);
+      const response = await request(app).get(`/user/${knownUserResponse.id}`);
       expect(response.status).toBe(200);
-      expect(response.body).toMatchObject(validUser);
+      expect(response.body).toMatchObject(knownUserResponse);
     });
 
     it('fetches a user that has just been created', async () => {
@@ -97,13 +105,13 @@ describe('/user endpoints', () => {
         .send(validUserInput)
         .set('Accept', 'application/json');
       expect(postResponse.status).toBe(201);
-      expect(postResponse.body).toMatchObject(validUserInput);
+      expect(postResponse.body).toMatchObject(validUserResponse);
 
       const newUserId = postResponse.body.id;
 
       const response = await request(app).get(`/user/${newUserId}`);
       expect(response.status).toBe(200);
-      expect(response.body).toMatchObject(validUserInput);
+      expect(response.body).toMatchObject(validUserResponse);
     });
 
     it('returns an error if the user id does not exist', async () => {

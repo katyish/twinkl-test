@@ -22,7 +22,8 @@ export const createUser = (req: Request, res: Response) => {
       res
         .status(400)
         .json({ message: 'Validation Failed', errors: error.issues });
+    } else {
+      res.status(500).send('Server Error');
     }
-    res.status(500).send('Server Error');
   }
 };

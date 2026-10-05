@@ -14,6 +14,8 @@ export type User = {
   createdAt: string;
 };
 
+export type UserResponse = Omit<User, 'password'>;
+
 export const createUserSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.email(),
@@ -50,7 +52,7 @@ class UserService {
     return null;
   };
 
-  createUser = (input: unknown) => {
+  createUser = (input: unknown): UserResponse => {
     const validInput: CreateUserInput = createUserSchema.parse(input);
     const newUser: User = {
       ...validInput,
@@ -58,7 +60,10 @@ class UserService {
       createdAt: formatISO(new Date()),
     };
     this.userList.push(newUser);
-    return newUser;
+
+    const { password, ...newUserResponse } = newUser;
+
+    return newUserResponse;
   };
 }
 

@@ -1,16 +1,15 @@
-import { userService } from './users.service';
+import { CreateUserInput, UserResponse, userService } from './users.service';
 
 jest.mock('crypto', () => ({
-  randomUUID: () => 'mock-random-uuid',
+  randomUUID: () => 'mock-random-uuid-for-testing',
 }));
 
-const invalidUserId = '88';
-const validUser = {
-  // matches our hardcoded seed data
+const invalidUserId = '8888-aaaa-4444-bbbb-2222';
+const validUser:UserResponse = {
+  // matches our hardcoded seed data, minus the pasword
   id: 'a8429ab6-b732-4cb9-bfb0-65e4db324394',
   name: 'John Doe',
   email: 'jd@jd.com',
-  password: '123456',
   userType: 'student',
   createdAt: '2026-10-04T17:00:00Z',
 };
@@ -35,126 +34,114 @@ describe('createUser', () => {
   afterEach(() => {
     jest.useRealTimers();
   });
+  const newUserInput: CreateUserInput = {
+    name: 'fred',
+    email: 'fred@hotmail.com',
+    password: 'ABc5Dfg83',
+    userType: 'student',
+  };
   it('returns user object if creation successful', async () => {
-    const newUserInput = {
+    const newUserResponse: UserResponse = {
+      id: 'mock-random-uuid-for-testing',
       name: 'fred',
       email: 'fred@hotmail.com',
-      password: 'ABc5Dfg83',
       userType: 'student',
+      createdAt: '2026-10-04T17:00:00Z',
     };
     const response = userService.createUser(newUserInput);
-    expect(response).toMatchObject(newUserInput);
-    expect(response?.id).toBe('mock-random-uuid');
-    expect(response?.createdAt).toBe('2026-10-04T17:00:00Z');
+    expect(response).toMatchObject(newUserResponse);
   });
 
   // test validation rules specified in instructions
   it('throws an error if a field is missing', async () => {
-    const newUserInput = {
+    const newUserInputMissingEmail = {
       // missing email field
-      name: 'fred',
-      password: 'Abc123yx',
-      userType: 'student',
+      ...newUserInput,
+      email: undefined,
     };
     expect(() => {
-      userService.createUser(newUserInput);
+      userService.createUser(newUserInputMissingEmail);
     }).toThrow('received undefined');
   });
 
   it('throws an error if a field is empty', async () => {
-    const newUserInput = {
+    const newUserInputEmptyField = {
+      ...newUserInput,
       name: '',
-      email: 'fred@hotmail.com',
-      password: 'AbcdeF99',
-      userType: 'student',
     };
     expect(() => {
-      userService.createUser(newUserInput);
+      userService.createUser(newUserInputEmptyField);
     }).toThrow();
   });
   it('throws an error if password is too short', async () => {
-    const newUserInput = {
-      name: 'fred',
-      email: 'fred@hotmail.com',
+    const newUserInputShortPassword = {
+      ...newUserInput,
       password: 'aB9',
-      userType: 'student',
     };
-    expect(() => {
-      userService.createUser(newUserInput);
-    }).toThrow('Too small');
+    expect(async () => {
+      await userService.createUser(newUserInputShortPassword);
+    }).rejects.toThrow('Too small');
   });
 
   it('throws an error if password is too long', async () => {
-    const newUserInput = {
-      name: 'fred',
-      email: 'fred@hotmail.com',
+    const newUserInputLongPassword = {
+      ...newUserInput,
       password:
         'aaaaaaAAAAAAAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa88888aaaaaaaaaaaaaaaaaaaaaaaaa',
-      userType: 'student',
     };
-    expect(() => {
-      userService.createUser(newUserInput);
-    }).toThrow('Too big');
+    expect(async () => {
+      await userService.createUser(newUserInputLongPassword);
+    }).rejects.toThrow('Too big');
   });
 
   it('throws an error if password does not contain a number', async () => {
-    const newUserInput = {
-      name: 'fred',
-      email: 'fred@hotmail.com',
+    const newUserInputPwNoNumber = {
+      ...newUserInput,
       password: 'ABCdefGH',
-      userType: 'student',
     };
-    expect(() => {
-      userService.createUser(newUserInput);
-    }).toThrow('Must contain at least one number');
+    expect(async () => {
+      await userService.createUser(newUserInputPwNoNumber);
+    }).rejects.toThrow('Must contain at least one number');
   });
 
   it('throws an error if password does not contain a lowercase letter', async () => {
-    const newUserInput = {
-      name: 'fred',
-      email: 'fred@hotmail.com',
+    const newUserInputPwNoLower = {
+      ...newUserInput,
       password: 'ABCDEFGH',
-      userType: 'student',
     };
-    expect(() => {
-      userService.createUser(newUserInput);
-    }).toThrow('Must contain at least one lowercase letter');
+    expect(async () => {
+      await userService.createUser(newUserInputPwNoLower);
+    }).rejects.toThrow('Must contain at least one lowercase letter');
   });
 
   it('throws an error if password does not contain an uppercase letter', async () => {
-    const newUserInput = {
-      name: 'fred',
-      email: 'fred@hotmail.com',
+    const newUserInputPwNoUpper = {
+      ...newUserInput,
       password: 'abcdefgh',
-      userType: 'student',
     };
-    expect(() => {
-      userService.createUser(newUserInput);
-    }).toThrow('Must contain at least one uppercase letter');
+    expect(async () => {
+      await userService.createUser(newUserInputPwNoUpper);
+    }).rejects.toThrow('Must contain at least one uppercase letter');
   });
 
   // test other validation
   it('throws an error if email is invalid', async () => {
-    const newUserInput = {
-      name: 'fred',
+    const newUserInputEmailInvalid = {
+      ...newUserInput,
       email: 'fredAThotmail.com',
-      password: 'AbcdeF99',
-      userType: 'student',
     };
-    expect(() => {
-      userService.createUser(newUserInput);
-    }).toThrow('Invalid email address');
+    expect(async () => {
+      await userService.createUser(newUserInputEmailInvalid);
+    }).rejects.toThrow('Invalid email address');
   });
 
   it('throws an error if userType is invalid', async () => {
-    const newUserInput = {
-      name: 'fred',
-      email: 'fred@hotmail.com',
-      password: 'AbcdeF99',
+    const newUserInputUserTypeInvalid = {
+      ...newUserInput,
       userType: 'unemployed',
     };
-    expect(() => {
-      userService.createUser(newUserInput);
-    }).toThrow('Invalid option');
+    expect(async () => {
+      await userService.createUser(newUserInputUserTypeInvalid);
+    }).rejects.toThrow('Invalid option');
   });
 });
