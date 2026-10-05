@@ -14,7 +14,7 @@ app.get('/user/:id', userController.getUser);
 
 app.post('/user', userController.createUser);
 
-app.listen(port, () => {
+export const server = app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });

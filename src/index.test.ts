@@ -1,6 +1,10 @@
 import request from 'supertest';
-import app from '.';
+import app, { server } from '.';
 import { UserResponse } from './users/users.service';
+
+afterAll(() => {
+  server.close();
+});
 
 describe('/ endpoint', () => {
   it('GET / should return hello world', async () => {
