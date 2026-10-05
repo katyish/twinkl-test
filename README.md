@@ -1,36 +1,46 @@
-# Twinkl TypeScript Test
+# User Signup API
 
-- [Task](#task)
+- [Endpoint Documentation](#endpoints)
 - [Development Environment Setup](#setup)
-- [What we are looking for](#what-we-are-looking-for)
+- [Future Improvements](#future-changes-for-a-more-realistic-app)
 
-## Task
+## The Application
 
-Your task is to implement a backend API (no front-end is required).
+This is a REST API, built using TypeScript and Express. Users are stored in an in-memory array - data only persists while the application is running.
 
-These are the requirements for the system:
+The original readme and requirements for this task can be found here: [Instructions](instructions.md)
 
-1. User Signup Endpoint
-    1. A `POST` endpoint, that accepts JSON, containing the user full name, password, email address, created date, and the user type (one of a student, teacher, parent or private tutor).
-    1. Validation. The app should check that the fields submitted are not empty. The app should also check that the password matches the following rules:
-        1. Between 8 and 64 characters
-        1. Must contain at least one digit (0-9)
-        1. Must contain at least one lowercase letter (a-z)
-        1. Must contain at least one uppercase letter (A-Z)
-    1. When validation fails the app should return an appropriate status code with error/s that can be used by the client
-1. Save the signup information to a data store. We recommend an in-memory data store (i.e an array) or a lightweight file database like SQLLite.
-1. User Signup Details
-    1. A `GET` endpoint that takes a user ID and returns the user details as JSON.
-1. Create whatever level of testing and documentation you consider appropriate
+- User ID is in the form of a randomly generated UUID (so we don't have to keep track/increment)
+- Password data is never returned (pull request #1)
+- I added validation to the `name` field to check it's between 2 and 100 characters, rather than just not empty.
+- I added a Dockerfile and docker-compose to build the app in a container
+- I added a very simple Github workflow to lint, build and run tests on PR or merge to main
 
-## What we are looking for
+# Endpoints
 
-* Submit something that we can run locally
-* Commiting changes with good messages as you go is very helpful
-* You can update the README or add a NOTES.md detailing any decisions/tradeoffs you made, or changes you would make with more time
-* Clean, secure, modular code written to your own standards of what good looks like. Add concise comments in the code if you want to explain a decision. 
-* Pragmatism. We are not looking for complex solutions, and there is no hidden trick requirement in our task ;) 
-* Feel free to install and use additional packages
+There are two API endpoints:
+
+### Fetch User Information
+
+`/user/:id` GET endpoint to return information for a given user id.
+Returns `200` and a JSON object describing the user, or `404` if no user exists for that id.
+
+```bash
+curl -X GET http://127.0.0.1:3000/user/a8429ab6-b732-4cb9-bfb0-65e4db324394
+```
+
+### Create User
+
+`/user` POST endpoint to validate and save a new user.
+Returns `201` and a JSON object describing the user, or `400` with a detailed error response if validation fails
+
+To call from the command line:
+
+```bash
+curl -X POST http://127.0.0.1:3000/user \
+   -H 'Content-Type: application/json' \
+   -d '{"name":"Sally Evans","password":"Pa55W0rd", "email": "sally@evans.org.uk", "userType": "student"}'
+```
 
 ## Setup
 
@@ -43,23 +53,8 @@ Before you begin, ensure you have the following installed on your machine:
 
 ### Installation
 
-This will install a basic [Express](https://expressjs.com/) app with Typescript.
-
-If you have been provided with a Github URL, clone the repository to your local machine:
-
-```
-git clone https://github.com/twinkltech/twinkl-typescript-tech-test.git
-```
-
-If you have been provided with a zip file, download to your computer and unzip.
-
-Navigate to the directory:
-
-```
-cd twinkl-typescript-tech-test
-```
-
-Install the dependencies:
+Ensure you are using version `20.11.0` of Node
+Install dependencies:
 
 ```
 npm i
@@ -73,9 +68,9 @@ In development the following command will start the server and use `nodemon` to 
 npm run dev
 ```
 
-The server will start at `http://localhost:3000` by default. You can change the port in `src/index.ts` 
+The server will start at `http://localhost:3000` by default. You can change the port in `src/index.ts`
 
-There are no tests in the project at the moment, but a command is available to run:
+Testing is done using Jest and Supertest, and can be run with:
 
 ```
 npm run test
@@ -88,7 +83,31 @@ npm run build
 npm start
 ```
 
-To run using Docker:
+And to build and run using a Docker container:
+
 ```
 docker compose up
 ```
+
+## Future changes for a more realistic app
+
+With more time I'd have ticked off a few of these, but there's a balance between "meeting the requirements in a sensible timefram" and "going down a rabbit hole chasing perfection"
+
+### General improvements:
+
+- [ ] Use a proper logging library instead of `console.log()`, and generally improve what gets logged
+- [ ] I chose to put Zod validation in the service, but it could be setup as middleware
+- [ ] There's a user object hardcoded into `UserList` in the service class, which is used by the tests and the examples in this readme. This could (should) be mocked for testing purposes.
+- [ ] Upgrade Node. v20 is _very_ old now. If the instructions/setup hadn't specified a version, I'd have built this on v24 (or maybe 26, as that's very nearly LTS).
+- [ ] General git repository setup - protect main branch, require CI to pass, etc etc. Out of scope for this task.
+
+### Additional functionality:
+
+- [ ] Password storage - save an encrypted version. This is **Very Important** as no real system should ever store passwords as plaintext.
+- [ ] Check if a user (email address) already exists before creating. Return 409 Conflict
+- [ ] Better API documentation - Swagger or similar
+- [ ] More validation/sanitation of user input. For security reasons, but also pragmatic things like "capitalisation of email shouldn't matter when trying to log in"
+- [ ] Route for login - validate email/password
+- [ ] Route to update user (add `updatedAt` field)
+- [ ] Route to remove user (if soft delete - add `deletedAt` or `disabled` field)
+- [ ] Use a proper datastore so that data is persisted.
