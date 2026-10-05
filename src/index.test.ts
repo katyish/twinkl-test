@@ -10,13 +10,14 @@ describe('/ endpoint', () => {
 });
 
 describe('/user endpoints', () => {
+  const validUserInput = {
+    name: 'fred smith',
+    password: '123456Abc',
+    email: 'fred@gmail.com',
+    userType: 'teacher',
+  };
+
   describe('POST /user', () => {
-    const validUserInput = {
-      name: 'fred smith',
-      password: '123456Abc',
-      email: 'fred@gmail.com',
-      userType: 'teacher',
-    };
     it('accepts valid data and creates a user', async () => {
       const response = await request(app)
         .post('/user')
@@ -71,7 +72,6 @@ describe('/user endpoints', () => {
         }),
       ]);
     });
-    it.todo('returns an error if user already exists');
   });
 
   describe('GET /user:id', () => {
@@ -82,13 +82,28 @@ describe('/user endpoints', () => {
       email: 'jd@jd.com',
       password: '123456',
       userType: 'student',
-      createdAt: '2026-10-03',
+      createdAt: '2026-10-04T17:00:00Z',
     };
 
     it('returns a JSON object of user details for a known user id', async () => {
       const response = await request(app).get(`/user/${validUser.id}`);
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject(validUser);
+    });
+
+    it('fetches a user that has just been created', async () => {
+      const postResponse = await request(app)
+        .post('/user')
+        .send(validUserInput)
+        .set('Accept', 'application/json');
+      expect(postResponse.status).toBe(201);
+      expect(postResponse.body).toMatchObject(validUserInput);
+
+      const newUserId = postResponse.body.id;
+
+      const response = await request(app).get(`/user/${newUserId}`);
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject(validUserInput);
     });
 
     it('returns an error if the user id does not exist', async () => {

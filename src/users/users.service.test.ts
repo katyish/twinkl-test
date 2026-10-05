@@ -12,7 +12,7 @@ const validUser = {
   email: 'jd@jd.com',
   password: '123456',
   userType: 'student',
-  createdAt: '2026-10-03',
+  createdAt: '2026-10-04T17:00:00Z',
 };
 
 describe('getUserById', () => {
@@ -28,6 +28,13 @@ describe('getUserById', () => {
 });
 
 describe('createUser', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-10-04T17:00:00Z'));
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
   it('returns user object if creation successful', async () => {
     const newUserInput = {
       name: 'fred',
@@ -38,7 +45,7 @@ describe('createUser', () => {
     const response = userService.createUser(newUserInput);
     expect(response).toMatchObject(newUserInput);
     expect(response?.id).toBe('mock-random-uuid');
-    // todo: check we have a createdAt date
+    expect(response?.createdAt).toBe('2026-10-04T17:00:00Z');
   });
 
   // test validation rules specified in instructions

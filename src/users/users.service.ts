@@ -1,3 +1,4 @@
+import { formatISO } from 'date-fns';
 import { randomUUID, UUID } from 'crypto';
 import { z } from 'zod';
 
@@ -36,7 +37,7 @@ class UserService {
       email: 'jd@jd.com',
       password: '123456',
       userType: 'student',
-      createdAt: '2026-10-03',
+      createdAt: '2026-10-04T17:00:00Z',
     },
   ];
 
@@ -54,7 +55,7 @@ class UserService {
     const newUser: User = {
       ...validInput,
       id: randomUUID(),
-      createdAt: '2026-10-04',
+      createdAt: formatISO(new Date()),
     };
     this.userList.push(newUser);
     return newUser;
