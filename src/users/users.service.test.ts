@@ -5,7 +5,7 @@ jest.mock('crypto', () => ({
 }));
 
 const invalidUserId = '8888-aaaa-4444-bbbb-2222';
-const validUser:UserResponse = {
+const validUser: UserResponse = {
   // matches our hardcoded seed data, minus the pasword
   id: 'a8429ab6-b732-4cb9-bfb0-65e4db324394',
   name: 'John Doe',
@@ -48,7 +48,7 @@ describe('createUser', () => {
       userType: 'student',
       createdAt: '2026-10-04T17:00:00Z',
     };
-    const response = userService.createUser(newUserInput);
+    const response = await userService.createUser(newUserInput);
     expect(response).toMatchObject(newUserResponse);
   });
 
@@ -59,9 +59,9 @@ describe('createUser', () => {
       ...newUserInput,
       email: undefined,
     };
-    expect(() => {
-      userService.createUser(newUserInputMissingEmail);
-    }).toThrow('received undefined');
+    expect(async () => {
+      await userService.createUser(newUserInputMissingEmail);
+    }).rejects.toThrow('received undefined');
   });
 
   it('throws an error if a field is empty', async () => {
@@ -69,9 +69,9 @@ describe('createUser', () => {
       ...newUserInput,
       name: '',
     };
-    expect(() => {
-      userService.createUser(newUserInputEmptyField);
-    }).toThrow();
+    expect(async () => {
+      await userService.createUser(newUserInputEmptyField);
+    }).rejects.toThrow();
   });
   it('throws an error if password is too short', async () => {
     const newUserInputShortPassword = {

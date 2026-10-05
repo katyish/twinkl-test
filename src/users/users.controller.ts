@@ -12,10 +12,10 @@ export const getUser = (req: Request, res: Response) => {
   }
 };
 
-export const createUser = (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response) => {
   try {
     console.log('creating new user');
-    const newUser = userService.createUser(req.body);
+    const newUser = await userService.createUser(req.body);
     res.status(201).json(newUser);
   } catch (error: any) {
     if (error instanceof ZodError) {

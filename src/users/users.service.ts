@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { formatISO } from 'date-fns';
 import { randomUUID, UUID } from 'crypto';
 import { z } from 'zod';
@@ -52,11 +53,13 @@ class UserService {
     return null;
   };
 
-  createUser = (input: unknown): UserResponse => {
+  createUser = async (input: unknown): Promise<UserResponse> => {
     const validInput: CreateUserInput = createUserSchema.parse(input);
+    const hashedPassword = await bcrypt.hash(validInput.password, 10);
     const newUser: User = {
       ...validInput,
       id: randomUUID(),
+      password: hashedPassword,
       createdAt: formatISO(new Date()),
     };
     this.userList.push(newUser);
