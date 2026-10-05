@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from 'express';
+import logger from './logger';
 import * as userController from './users/users.controller';
 
 const app: Express = express();
@@ -15,8 +16,10 @@ app.get('/user/:id', userController.getUser);
 app.post('/user', userController.createUser);
 
 export const server = app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+  logger.info(
+    { port },
+    `[server]: Server is running at http://localhost:${port}`,
+  );
 });
 
 export default app;

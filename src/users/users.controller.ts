@@ -5,25 +5,30 @@ import { userService } from './users.service';
 import logger from '../logger';
 
 export const getUser = (req: Request, res: Response) => {
-  logger.info(`attempting to fetch user with id ${req.params.id}`);
-  const user = userService.getUserById(req.params.id);
+  const userId = req.params.id;
+  logger.info(`attempting to fetch user with id ${userId}`);
+  const user = userService.getUserById(userId);
   if (user) {
     logger.info('returning user details');
     res.json(user);
   } else {
-    logger.error('User not found');
+    logger.error({ userId }, 'User not found');
     res.status(404).json({ error: 'User not found' });
   }
 };
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    logger.info('creating new user');
     const newUser = await userService.createUser(req.body);
+    // log user creation, but without any PII
+    logger.info({ userId: newUser.id }, 'sucessfully created new user');
     res.status(201).json(newUser);
   } catch (error: any) {
     if (error instanceof ZodError) {
-      logger.error({ msg: 'User creation failed, validation error' });
+      logger.warn(
+        { errors: error.issues },
+        'User creation failed, validation error',
+      );
       res
         .status(400)
         .json({ message: 'Validation Failed', errors: error.issues });
