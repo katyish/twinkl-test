@@ -11,10 +11,10 @@ This is a REST API, built using TypeScript and Express. Users are stored in an i
 The original readme and requirements for this task can be found here: [Instructions](instructions.md)
 
 - User ID is in the form of a randomly generated UUID (so we don't have to keep track/increment)
-- Password data is never returned (pull request #1)
-- I added validation to the `name` field to check it's between 2 and 100 characters, rather than just not empty.
-- I added a Dockerfile and docker-compose to build the app in a container
-- I added a very simple Github workflow to lint, build and run tests on PR or merge to main
+- Passwords are hashed before saving, and password is not included in the response (pull request #1 and #2)
+- Added validation to the `name` field to check it's between 2 and 100 characters, rather than just not empty
+- Added a Dockerfile and docker-compose to build the app in a container
+- Added a very simple Github workflow to lint, build and run tests on PR/merge to main
 
 # Endpoints
 
@@ -26,7 +26,7 @@ There are two API endpoints:
 Returns `200` and a JSON object describing the user, or `404` if no user exists for that id.
 
 ```bash
-curl -X GET http://127.0.0.1:3000/user/a8429ab6-b732-4cb9-bfb0-65e4db324394
+curl -X GET http://localhost:3000/user/a8429ab6-b732-4cb9-bfb0-65e4db324394
 ```
 
 ### Create User
@@ -37,7 +37,7 @@ Returns `201` and a JSON object describing the user, or `400` with a detailed er
 To call from the command line:
 
 ```bash
-curl -X POST http://127.0.0.1:3000/user \
+curl -X POST http://localhost:3000/user \
    -H 'Content-Type: application/json' \
    -d '{"name":"Sally Evans","password":"Pa55W0rd", "email": "sally@evans.org.uk", "userType": "student"}'
 ```
@@ -53,8 +53,7 @@ Before you begin, ensure you have the following installed on your machine:
 
 ### Installation
 
-Ensure you are using version `20.11.0` of Node
-Install dependencies:
+Ensure you are using version `20.11.0` of Node. Install dependencies:
 
 ```
 npm i
@@ -103,7 +102,6 @@ With more time I'd have ticked off a few of these, but there's a balance between
 
 ### Additional functionality:
 
-- [ ] Password storage - save an encrypted version. This is **Very Important** as no real system should ever store passwords as plaintext.
 - [ ] Check if a user (email address) already exists before creating. Return 409 Conflict
 - [ ] Better API documentation - Swagger or similar
 - [ ] More validation/sanitation of user input. For security reasons, but also pragmatic things like "capitalisation of email shouldn't matter when trying to log in"
