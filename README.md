@@ -94,7 +94,6 @@ With more time I'd have ticked off a few of these, but there's a balance between
 
 ### General improvements:
 
-- [ ] Use a proper logging library instead of `console.log()`, and generally improve what gets logged
 - [ ] I chose to put Zod validation in the service, but it could be setup as middleware
 - [ ] There's a user object hardcoded into `UserList` in the service class, which is used by the tests and the examples in this readme. This could (should) be mocked for testing purposes.
 - [ ] Upgrade Node. v20 is _very_ old now. If the instructions/setup hadn't specified a version, I'd have built this on v24 (or maybe 26, as that's very nearly LTS).

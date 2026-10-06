@@ -45,7 +45,6 @@ class UserService {
   ];
 
   getUserById = (userId: string): User | null => {
-    console.log(`fetching user id ${userId}`);
     const user = this.userList.find((u) => u.id === userId);
     if (user) {
       return user;
